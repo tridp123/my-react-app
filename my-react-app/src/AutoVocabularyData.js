@@ -1,0 +1,17 @@
+export const AUTO_VOCABULARY = [
+  { word: 'Mellifluous', ipa: '/meˈlɪfluəs/', meaning: 'Ngọt ngào, dịu dàng (thường nói về giọng nói)', example: 'The singer has a mellifluous voice.' },
+  { word: 'Labyrinthine', ipa: '/ˌlæbəˈrɪnθaɪn/', meaning: 'Rắc rối, như mê cung', example: 'The city’s labyrinthine streets were difficult to navigate.' },
+  { word: 'Sycophant', ipa: '/ˈsɪkəfænt/', meaning: 'Kẻ nịnh hót', example: 'He is surrounded by sycophants who agree with everything he says.' },
+  { word: 'Ineffable', ipa: '/ɪnˈefəbl/', meaning: 'Không thốt nên lời', example: 'The beauty of the landscape was ineffable.' },
+  { word: 'Petrichor', ipa: '/ˈpetrɪkɔːr/', meaning: 'Mùi của đất sau cơn mưa', example: 'I love the smell of petrichor in the early morning.' },
+  { word: 'Languid', ipa: '/ˈlæŋɡwɪd/', meaning: 'Uể oải, chậm chạp', example: 'We spent a languid afternoon by the pool.' },
+  { word: 'Surreptitious', ipa: '/ˌsʌrəpˈtɪʃəs/', meaning: 'Lén lút, âm thầm', example: 'They shared a surreptitious glance during the meeting.' },
+  { word: 'Obsequious', ipa: '/əbˈsiːkwiəs/', meaning: 'Khúm núm, tâng bốc', example: 'The waiter was obsequious to the rich customers.' },
+  { word: 'Ephemeral', ipa: '/ɪˈfemərəl/', meaning: 'Phù du, ngắn ngủi', example: 'Fashion trends are often ephemeral.' },
+  { word: 'Sanguine', ipa: '/ˈsæŋɡwɪn/', meaning: 'Lạc quan, đầy hy vọng', example: 'She remains sanguine about the prospects for success.' },
+  { word: 'Fastidious', ipa: '/fæˈstɪdiəs/', meaning: 'Khó tính, tỉ mỉ', example: 'He is fastidious about his appearance.' },
+  { word: 'Taciturn', ipa: '/ˈtæsɪtɜːrn/', meaning: 'Ít nói, lầm lì', example: 'The detective was a taciturn man who rarely smiled.' },
+  { word: 'Venerable', ipa: '/ˈvenərəbl/', meaning: 'Đáng kính', example: 'The venerable professor gave an inspiring lecture.' },
+  { word: 'Capricious', ipa: '/kəˈprɪʃəs/', meaning: 'Thất thường, hay thay đổi', example: 'The weather in this region is quite capricious.' },
+  { word: 'Audacious', ipa: '/ɔːˈdeɪʃəs/', meaning: 'Táo bạo, liều lĩnh', example: 'It was an audacious plan, but it worked.' },
+];
