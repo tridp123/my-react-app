@@ -1,18 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './EnglishLearningPage.css';
+import logo from './logo_premium.png';
+import { DEFAULT_VOCABULARY } from './AutoVocabularyData';
 
-const DEFAULT_VOCABULARY = [
-  { id: 1, word: 'Ebullient', ipa: '/ɪˈbʌliənt/', meaning: 'Tràn đầy năng lượng, phấn khởi', example: 'She sounded ebullient on the phone.' },
-  { id: 2, word: 'Serendipity', ipa: '/ˌserənˈdɪpəti/', meaning: 'Sự tình cờ may mắn', example: 'By pure serendipity, I met my old friend at the airport.' },
-  { id: 3, word: 'Quintessential', ipa: '/ˌkwɪntɪˈsenʃl/', meaning: 'Tinh hoa, điển hình nhất', example: 'It was the quintessential sunset over the ocean.' },
-  { id: 4, word: 'Ephemeral', ipa: '/ɪˈfemərəl/', meaning: 'Phù du, chóng tàn', example: 'Fame is often ephemeral in the age of social media.' },
-];
 
 const EnglishLearningPage = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [voice, setVoice] = useState(null);
   const [vocabulary, setVocabulary] = useState(DEFAULT_VOCABULARY);
+  const [showMeaning, setShowMeaning] = useState(false);
 
   useEffect(() => {
     const refreshVocab = () => {
@@ -44,10 +41,12 @@ const EnglishLearningPage = () => {
 
   const nextWord = () => {
     setCurrentIndex((prev) => (prev + 1) % vocabulary.length);
+    setShowMeaning(false); // Reset for next word
   };
 
   const prevWord = () => {
     setCurrentIndex((prev) => (prev - 1 + vocabulary.length) % vocabulary.length);
+    setShowMeaning(false); // Reset for prev word
   };
 
   const speak = (text) => {
@@ -73,7 +72,10 @@ const EnglishLearningPage = () => {
     <div className="learning-container">
       <nav className="learning-nav">
         <Link to="/" className="back-link">← Home</Link>
-        <h2 className="brand-name">English Master</h2>
+        <div className="nav-brand">
+          <img src={logo} alt="Logo" className="nav-logo" />
+          <h2 className="brand-name">English Master</h2>
+        </div>
       </nav>
 
       <main className="learning-main">
@@ -89,7 +91,7 @@ const EnglishLearningPage = () => {
           
           <div className="word-image-container">
             <img 
-              src={`https://source.unsplash.com/featured/800x450/?${current.word},nature,minimalist`} 
+              src={current.image || `https://source.unsplash.com/featured/800x450/?${current.word},nature,minimalist`} 
               alt={current.word} 
               className="word-image"
               onError={(e) => {
@@ -107,16 +109,25 @@ const EnglishLearningPage = () => {
           </div>
           <p className="word-ipa">{current.ipa}</p>
           <div className="divider"></div>
-          <p className="word-meaning">{current.meaning}</p>
-          <div className="example-box">
-            <div className="example-header">
-              <strong>Example:</strong>
-              <button className="speaker-btn-small" onClick={() => speak(current.example)} title="Listen to example">
-                🔊
-              </button>
+          
+          <div className={`meaning-section ${showMeaning ? 'visible' : 'hidden'}`}>
+            <p className="word-meaning">{current.meaning}</p>
+            <div className="example-box">
+              <div className="example-header">
+                <strong>Example:</strong>
+                <button className="speaker-btn-small" onClick={() => speak(current.example)} title="Listen to example">
+                  🔊
+                </button>
+              </div>
+              <p className="word-example">"{current.example}"</p>
             </div>
-            <p className="word-example">"{current.example}"</p>
           </div>
+
+          {!showMeaning && (
+            <button className="reveal-btn" onClick={() => setShowMeaning(true)}>
+              Xem nghĩa & ví dụ
+            </button>
+          )}
         </div>
 
         <div className="controls">

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './VocabularyManager.css';
+import logo from './logo_premium.png';
 
 const VocabularyManager = () => {
   const [vocab, setVocab] = useState([]);
-  const [newWord, setNewWord] = useState({ word: '', ipa: '', meaning: '', example: '' });
+  const [newWord, setNewWord] = useState({ word: '', ipa: '', meaning: '', example: '', image: '' });
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const refreshVocab = () => {
@@ -17,27 +19,49 @@ const VocabularyManager = () => {
     return () => window.removeEventListener('vocab_updated', refreshVocab);
   }, []);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewWord({ ...newWord, image: reader.result });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAdd = (e) => {
     e.preventDefault();
     if (!newWord.word || !newWord.meaning) return;
     
-    const updatedVocab = [...vocab, { ...newWord, id: Date.now() }];
+    const updatedVocab = [{ ...newWord, id: Date.now() }, ...vocab];
     setVocab(updatedVocab);
     localStorage.setItem('my_vocabulary', JSON.stringify(updatedVocab));
-    setNewWord({ word: '', ipa: '', meaning: '', example: '' });
+    setNewWord({ word: '', ipa: '', meaning: '', example: '', image: '' });
+    e.target.reset(); // Reset file input
   };
 
   const handleDelete = (id) => {
-    const updatedVocab = vocab.filter(item => item.id !== id);
-    setVocab(updatedVocab);
-    localStorage.setItem('my_vocabulary', JSON.stringify(updatedVocab));
+    if (window.confirm('Bạn có chắc chắn muốn xóa từ này?')) {
+      const updatedVocab = vocab.filter(item => item.id !== id);
+      setVocab(updatedVocab);
+      localStorage.setItem('my_vocabulary', JSON.stringify(updatedVocab));
+    }
   };
+
+  const filteredVocab = vocab.filter(item => 
+    item.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.meaning.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="manager-container">
       <nav className="manager-nav">
         <Link to="/" className="back-link">← Home</Link>
-        <h2 className="brand-name">Vocabulary Manager</h2>
+        <div className="nav-brand">
+          <img src={logo} alt="Logo" className="nav-logo" />
+          <h2 className="brand-name">Vocabulary Manager</h2>
+        </div>
       </nav>
 
       <main className="manager-main">
@@ -62,17 +86,44 @@ const VocabularyManager = () => {
               placeholder="Câu ví dụ..." 
               value={newWord.example} onChange={(e) => setNewWord({...newWord, example: e.target.value})}
             ></textarea>
+            
+            <div className="file-upload">
+              <label htmlFor="file-input">Hình ảnh mô tả (Tùy chọn):</label>
+              <input 
+                id="file-input"
+                type="file" 
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              {newWord.image && (
+                <div className="image-preview">
+                  <img src={newWord.image} alt="Preview" />
+                </div>
+              )}
+            </div>
+
             <button type="submit" className="add-btn">Thêm vào danh sách</button>
           </form>
         </section>
 
         <section className="list-section">
-          <h3>Danh sách từ của bạn ({vocab.length})</h3>
+          <div className="list-header">
+            <h3>Danh sách của bạn ({vocab.length})</h3>
+            <input 
+              type="text" 
+              placeholder="Tìm kiếm từ..." 
+              className="search-input"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
           <div className="vocab-list">
-            {vocab.length === 0 ? (
-              <p className="empty-msg">Chưa có từ vựng nào. Hãy bắt đầu thêm!</p>
+            {filteredVocab.length === 0 ? (
+              <p className="empty-msg">
+                {searchTerm ? 'Không tìm thấy kết quả phù hợp.' : 'Chưa có từ vựng nào.'}
+              </p>
             ) : (
-              vocab.map(item => (
+              filteredVocab.map(item => (
                 <div key={item.id} className="list-item">
                   <div className="item-info">
                     <strong>{item.word}</strong> <span className="item-ipa">{item.ipa}</span>

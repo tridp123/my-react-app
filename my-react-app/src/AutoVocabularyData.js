@@ -1,4 +1,4 @@
-export const AUTO_VOCABULARY = [
+export const DEFAULT_VOCABULARY = [
   { word: 'Mellifluous', ipa: '/meˈlɪfluəs/', meaning: 'Ngọt ngào, dịu dàng (thường nói về giọng nói)', example: 'The singer has a mellifluous voice.' },
   { word: 'Labyrinthine', ipa: '/ˌlæbəˈrɪnθaɪn/', meaning: 'Rắc rối, như mê cung', example: 'The city’s labyrinthine streets were difficult to navigate.' },
   { word: 'Sycophant', ipa: '/ˈsɪkəfænt/', meaning: 'Kẻ nịnh hót', example: 'He is surrounded by sycophants who agree with everything he says.' },
