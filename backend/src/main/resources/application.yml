@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/myreactapp
     username: root
-    password: root
+    password: tridp123x@X
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
