@@ -65,6 +65,25 @@
   box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4);
 }
 
+.conv-btn {
+  display: inline-block;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  background-color: #312e81; /* Indigo-900 */
+  color: #f8fafc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  transition: all 0.3s ease;
+}
+
+.conv-btn:hover {
+  background-color: #3730a3; /* Indigo-800 */
+  border-color: #6366f1;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2);
+}
+
 .manage-btn {
   display: inline-block;
   padding: 1rem 2rem;

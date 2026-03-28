@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
 import EnglishLearningPage from './EnglishLearningPage';
 import VocabularyManager from './VocabularyManager';
+import ConversationLearning from './ConversationLearning';
 import { DEFAULT_VOCABULARY } from './AutoVocabularyData';
 
 function Home() {
@@ -46,6 +47,9 @@ function Home() {
         <div className="home-links">
           <Link className="start-btn" to="/learn">
             Bắt đầu học ngay
+          </Link>
+          <Link className="conv-btn" to="/conversation">
+            Học qua hội thoại
           </Link>
           <Link className="manage-btn" to="/manage">
             Quản lý từ vựng
@@ -107,6 +111,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/learn" element={<EnglishLearningPage />} />
+        <Route path="/conversation" element={<ConversationLearning />} />
         <Route path="/manage" element={<VocabularyManager />} />
       </Routes>
     </BrowserRouter>
