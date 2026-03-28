@@ -12,10 +12,25 @@ const EnglishLearningPage = () => {
   const [showMeaning, setShowMeaning] = useState(false);
 
   useEffect(() => {
-    const refreshVocab = () => {
-      const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary'));
-      if (savedVocab && savedVocab.length > 0) {
-        setVocabulary(savedVocab);
+    const refreshVocab = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/vocabularies');
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.length > 0) {
+            data.sort((a, b) => b.id - a.id);
+            setVocabulary(data);
+            localStorage.setItem('my_vocabulary', JSON.stringify(data));
+          } else {
+            setVocabulary(DEFAULT_VOCABULARY);
+          }
+        } else {
+          const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary'));
+          if (savedVocab && savedVocab.length > 0) setVocabulary(savedVocab);
+        }
+      } catch (e) {
+        const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary'));
+        if (savedVocab && savedVocab.length > 0) setVocabulary(savedVocab);
       }
     };
 

@@ -14,9 +14,21 @@ function Home() {
   const [wordCount, setWordCount] = React.useState(0);
 
   React.useEffect(() => {
-    const updateCount = () => {
-      const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary')) || [];
-      setWordCount(savedVocab.length);
+    const updateCount = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/vocabularies');
+        if (response.ok) {
+          const data = await response.json();
+          setWordCount(data.length);
+          localStorage.setItem('my_vocabulary', JSON.stringify(data));
+        } else {
+          const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary')) || [];
+          setWordCount(savedVocab.length);
+        }
+      } catch (err) {
+        const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary')) || [];
+        setWordCount(savedVocab.length);
+      }
     };
     updateCount();
     window.addEventListener('vocab_updated', updateCount);
@@ -85,9 +97,18 @@ function App() {
 
         if (availableWords.length > 0) {
           const randomWord = availableWords[Math.floor(Math.random() * availableWords.length)];
-          const updatedVocab = [...savedVocab, { ...randomWord, id: Date.now() }];
-          localStorage.setItem('my_vocabulary', JSON.stringify(updatedVocab));
-          window.dispatchEvent(new Event('vocab_updated'));
+          fetch('http://localhost:8080/api/vocabularies', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(randomWord)
+          })
+          .then(res => res.ok ? res.json() : Promise.reject('Failed'))
+          .then(createdWord => {
+            const updatedVocab = [createdWord, ...savedVocab];
+            localStorage.setItem('my_vocabulary', JSON.stringify(updatedVocab));
+            window.dispatchEvent(new Event('vocab_updated'));
+          })
+          .catch(console.error);
         }
       }, 60000);
     };

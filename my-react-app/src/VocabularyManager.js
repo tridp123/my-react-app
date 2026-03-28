@@ -9,9 +9,25 @@ const VocabularyManager = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const refreshVocab = () => {
-      const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary')) || [];
-      setVocab(savedVocab);
+    const refreshVocab = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/vocabularies');
+        if (response.ok) {
+          const data = await response.json();
+          // Sắp xếp ID giảm dần (từ mới nhất lên đầu)
+          data.sort((a, b) => b.id - a.id);
+          setVocab(data);
+          // Cập nhật localStorage dự phòng
+          localStorage.setItem('my_vocabulary', JSON.stringify(data));
+        } else {
+          const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary')) || [];
+          setVocab(savedVocab);
+        }
+      } catch (e) {
+        console.error(e);
+        const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary')) || [];
+        setVocab(savedVocab);
+      }
     };
 
     refreshVocab();
@@ -30,22 +46,48 @@ const VocabularyManager = () => {
     }
   };
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
     if (!newWord.word || !newWord.meaning) return;
     
-    const updatedVocab = [{ ...newWord, id: Date.now() }, ...vocab];
-    setVocab(updatedVocab);
-    localStorage.setItem('my_vocabulary', JSON.stringify(updatedVocab));
+    try {
+      const response = await fetch('http://localhost:8080/api/vocabularies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newWord)
+      });
+      if (response.ok) {
+        const createdWord = await response.json();
+        const updatedVocab = [createdWord, ...vocab];
+        setVocab(updatedVocab);
+        localStorage.setItem('my_vocabulary', JSON.stringify(updatedVocab));
+      } else {
+        alert("Có lỗi xảy ra khi lưu từ vựng!");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Không thể kết nối tới server!");
+    }
     setNewWord({ word: '', ipa: '', meaning: '', example: '', image: '' });
     e.target.reset(); // Reset file input
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa từ này?')) {
-      const updatedVocab = vocab.filter(item => item.id !== id);
-      setVocab(updatedVocab);
-      localStorage.setItem('my_vocabulary', JSON.stringify(updatedVocab));
+      try {
+        const response = await fetch(`http://localhost:8080/api/vocabularies/${id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          const updatedVocab = vocab.filter(item => item.id !== id);
+          setVocab(updatedVocab);
+          localStorage.setItem('my_vocabulary', JSON.stringify(updatedVocab));
+        } else {
+          alert('Có lỗi xảy ra khi xóa!');
+        }
+      } catch (err) {
+        alert('Không thể kết nối tới server!');
+      }
     }
   };
 

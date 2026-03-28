@@ -16,4 +16,9 @@ public class Vocabulary {
 
     private String meaning;
     private String example;
+    
+    private String ipa;
+    
+    @Column(columnDefinition = "LONGTEXT")
+    private String image;
 }

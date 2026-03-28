@@ -20,6 +20,8 @@ public class VocabularyService {
         existing.setWord(vocab.getWord());
         existing.setMeaning(vocab.getMeaning());
         existing.setExample(vocab.getExample());
+        existing.setIpa(vocab.getIpa());
+        existing.setImage(vocab.getImage());
         return repo.save(existing);
     }
     public void delete(Long id) { repo.deleteById(id); }
