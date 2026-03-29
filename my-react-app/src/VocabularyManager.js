@@ -7,29 +7,29 @@ const VocabularyManager = () => {
   const [vocab, setVocab] = useState([]);
   const [newWord, setNewWord] = useState({ word: '', ipa: '', meaning: '', example: '', image: '' });
   const [searchTerm, setSearchTerm] = useState('');
+  const [csvFile, setCsvFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  useEffect(() => {
-    const refreshVocab = async () => {
-      try {
-        const response = await fetch('http://localhost:8080/api/vocabularies');
-        if (response.ok) {
-          const data = await response.json();
-          // Sắp xếp ID giảm dần (từ mới nhất lên đầu)
-          data.sort((a, b) => b.id - a.id);
-          setVocab(data);
-          // Cập nhật localStorage dự phòng
-          localStorage.setItem('my_vocabulary', JSON.stringify(data));
-        } else {
-          const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary')) || [];
-          setVocab(savedVocab);
-        }
-      } catch (e) {
-        console.error(e);
+  const refreshVocab = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/vocabularies');
+      if (response.ok) {
+        const data = await response.json();
+        data.sort((a, b) => b.id - a.id);
+        setVocab(data);
+        localStorage.setItem('my_vocabulary', JSON.stringify(data));
+      } else {
         const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary')) || [];
         setVocab(savedVocab);
       }
-    };
+    } catch (e) {
+      console.error(e);
+      const savedVocab = JSON.parse(localStorage.getItem('my_vocabulary')) || [];
+      setVocab(savedVocab);
+    }
+  };
 
+  useEffect(() => {
     refreshVocab();
     window.addEventListener('vocab_updated', refreshVocab);
     return () => window.removeEventListener('vocab_updated', refreshVocab);
@@ -70,6 +70,37 @@ const VocabularyManager = () => {
     }
     setNewWord({ word: '', ipa: '', meaning: '', example: '', image: '' });
     e.target.reset(); // Reset file input
+  };
+
+  const handleCsvUpload = async (e) => {
+    e.preventDefault();
+    if (!csvFile) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', csvFile);
+
+    try {
+      const response = await fetch('http://localhost:8080/api/vocabularies/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        alert("Import thành công!");
+        setCsvFile(null);
+        refreshVocab();
+        e.target.reset();
+      } else {
+        const errorText = await response.text();
+        alert(`Lỗi import: ${errorText}`);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Không thể kết nối tới server!");
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -142,8 +173,26 @@ const VocabularyManager = () => {
               )}
             </div>
 
+
             <button type="submit" className="add-btn">Thêm vào danh sách</button>
           </form>
+
+          <div className="csv-import-section">
+            <hr className="divider" />
+            <h3>Import từ file CSV</h3>
+            <p className="hint">Định dạng file: <code>word, meaning, example, ipa, image</code></p>
+            <form onSubmit={handleCsvUpload} className="csv-form">
+              <input 
+                type="file" 
+                accept=".csv" 
+                onChange={(e) => setCsvFile(e.target.files[0])}
+                required
+              />
+              <button type="submit" className="import-btn" disabled={isUploading || !csvFile}>
+                {isUploading ? 'Đang xử lý...' : 'Bắt đầu Import'}
+              </button>
+            </form>
+          </div>
         </section>
 
         <section className="list-section">
