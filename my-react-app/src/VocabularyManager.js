@@ -73,21 +73,19 @@ const VocabularyManager = () => {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa từ này?')) {
-      try {
-        const response = await fetch(`http://localhost:8080/api/vocabularies/${id}`, {
-          method: 'DELETE'
-        });
-        if (response.ok) {
-          const updatedVocab = vocab.filter(item => item.id !== id);
-          setVocab(updatedVocab);
-          localStorage.setItem('my_vocabulary', JSON.stringify(updatedVocab));
-        } else {
-          alert('Có lỗi xảy ra khi xóa!');
-        }
-      } catch (err) {
-        alert('Không thể kết nối tới server!');
+    try {
+      const response = await fetch(`http://localhost:8080/api/vocabularies/${id}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        const updatedVocab = vocab.filter(item => item.id !== id);
+        setVocab(updatedVocab);
+        localStorage.setItem('my_vocabulary', JSON.stringify(updatedVocab));
+      } else {
+        alert('Có lỗi xảy ra khi xóa!');
       }
+    } catch (err) {
+      alert('Không thể kết nối tới server!');
     }
   };
 

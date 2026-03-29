@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
@@ -26,6 +26,25 @@ public class VocabularyController {
     public ResponseEntity<Vocabulary> create(@Valid @RequestBody Vocabulary vocab) {
         Vocabulary created = service.create(vocab);
         return ResponseEntity.ok(created);
+    }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<List<Vocabulary>> createBulk(@RequestBody List<Vocabulary> vocabs) {
+        return ResponseEntity.ok(service.createAll(vocabs));
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadCsv(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("Please select a CSV file to upload.");
+        }
+
+        try {
+            service.importFromCsv(file.getInputStream());
+            return ResponseEntity.ok("File imported successfully!");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
+        }
     }
 
     @PutMapping("/{id}")
