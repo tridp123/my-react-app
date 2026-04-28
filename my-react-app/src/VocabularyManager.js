@@ -5,10 +5,34 @@ import logo from './logo_premium.png';
 
 const VocabularyManager = () => {
   const [vocab, setVocab] = useState([]);
-  const [newWord, setNewWord] = useState({ word: '', ipa: '', meaning: '', example: '', image: '' });
+  const [newWord, setNewWord] = useState({ word: '', ipa: '', meaning: '', example: '', image: '', topic: '' });
   const [searchTerm, setSearchTerm] = useState('');
   const [csvFile, setCsvFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [autoJobEnabled, setAutoJobEnabled] = useState(false);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/autojob/status')
+      .then(res => res.json())
+      .then(data => setAutoJobEnabled(data.enabled))
+      .catch(console.error);
+  }, []);
+
+  const toggleAutoJob = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/autojob/toggle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: !autoJobEnabled })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setAutoJobEnabled(data.enabled);
+      }
+    } catch (e) {
+      alert("Không thể thay đổi trạng thái tự động thêm từ!");
+    }
+  };
 
   const refreshVocab = async () => {
     try {
@@ -35,17 +59,6 @@ const VocabularyManager = () => {
     return () => window.removeEventListener('vocab_updated', refreshVocab);
   }, []);
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewWord({ ...newWord, image: reader.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleAdd = async (e) => {
     e.preventDefault();
     if (!newWord.word || !newWord.meaning) return;
@@ -68,7 +81,7 @@ const VocabularyManager = () => {
       console.error(err);
       alert("Không thể kết nối tới server!");
     }
-    setNewWord({ word: '', ipa: '', meaning: '', example: '', image: '' });
+    setNewWord({ word: '', ipa: '', meaning: '', example: '', image: '', topic: '' });
     e.target.reset(); // Reset file input
   };
 
@@ -137,7 +150,18 @@ const VocabularyManager = () => {
 
       <main className="manager-main">
         <section className="add-section">
-          <h3>Thêm từ vựng mới</h3>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h3>Thêm từ vựng mới</h3>
+            <button 
+              onClick={toggleAutoJob}
+              style={{
+                backgroundColor: autoJobEnabled ? '#22c55e' : '#ef4444',
+                color: 'white', border: 'none', padding: '8px 15px',
+                borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'
+              }}>
+              Tự Động Thêm Từ: {autoJobEnabled ? 'BẬT (ON)' : 'TẮT (OFF)'}
+            </button>
+          </div>
           <form onSubmit={handleAdd} className="add-form">
             <input 
               type="text" placeholder="Từ vựng (Ví dụ: Serendipity)" 
@@ -158,13 +182,28 @@ const VocabularyManager = () => {
               value={newWord.example} onChange={(e) => setNewWord({...newWord, example: e.target.value})}
             ></textarea>
             
+            <input 
+              type="text" 
+              placeholder="Chủ đề (Topic) - VD: Công việc, Thu thập" 
+              list="topic-options"
+              value={newWord.topic} 
+              onChange={(e) => setNewWord({...newWord, topic: e.target.value})}
+            />
+            <datalist id="topic-options">
+              {[...new Set(vocab.map(v => v.topic?.name).filter(Boolean))].map(topicName => (
+                <option key={topicName} value={topicName} />
+              ))}
+            </datalist>
+
             <div className="file-upload">
-              <label htmlFor="file-input">Hình ảnh mô tả (Tùy chọn):</label>
+              <label htmlFor="file-input">Hình ảnh mô tả (URL - Tùy chọn):</label>
               <input 
                 id="file-input"
-                type="file" 
-                accept="image/*"
-                onChange={handleImageChange}
+                type="text" 
+                placeholder="Ví dụ: https://example.com/cat.jpg"
+                value={newWord.image}
+                onChange={(e) => setNewWord({...newWord, image: e.target.value})}
+                style={{ width: '100%', padding: '0.8rem', marginTop: '0.5rem', borderRadius: '8px', border: '1px solid #ccc' }}
               />
               {newWord.image && (
                 <div className="image-preview">
@@ -180,7 +219,7 @@ const VocabularyManager = () => {
           <div className="csv-import-section">
             <hr className="divider" />
             <h3>Import từ file CSV</h3>
-            <p className="hint">Định dạng file: <code>word, meaning, example, ipa, image</code></p>
+            <p className="hint">Định dạng file: <code>word, meaning, example, ipa, image, topic</code></p>
             <form onSubmit={handleCsvUpload} className="csv-form">
               <input 
                 type="file" 
@@ -217,6 +256,7 @@ const VocabularyManager = () => {
                   <div className="item-info">
                     <strong>{item.word}</strong> <span className="item-ipa">{item.ipa}</span>
                     <p>{item.meaning}</p>
+                    {item.topic && <span className="topic-tag">{item.topic.name}</span>}
                   </div>
                   <button className="del-btn" onClick={() => handleDelete(item.id)}>🗑️</button>
                 </div>

@@ -1,6 +1,7 @@
 package com.tridp123.backend.controller;
 
 import com.tridp123.backend.model.Vocabulary;
+import com.tridp123.backend.model.VocabularyDto;
 import com.tridp123.backend.service.VocabularyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,14 +24,14 @@ public class VocabularyController {
     public Vocabulary get(@PathVariable Long id) { return service.get(id); }
 
     @PostMapping
-    public ResponseEntity<Vocabulary> create(@Valid @RequestBody Vocabulary vocab) {
-        Vocabulary created = service.create(vocab);
+    public ResponseEntity<Vocabulary> create(@Valid @RequestBody VocabularyDto dto) {
+        Vocabulary created = service.create(dto);
         return ResponseEntity.ok(created);
     }
 
     @PostMapping("/bulk")
-    public ResponseEntity<List<Vocabulary>> createBulk(@RequestBody List<Vocabulary> vocabs) {
-        return ResponseEntity.ok(service.createAll(vocabs));
+    public ResponseEntity<List<Vocabulary>> createBulk(@RequestBody List<VocabularyDto> dtos) {
+        return ResponseEntity.ok(service.createAll(dtos));
     }
 
     @PostMapping("/upload")
@@ -48,8 +49,8 @@ public class VocabularyController {
     }
 
     @PutMapping("/{id}")
-    public Vocabulary update(@PathVariable Long id, @Valid @RequestBody Vocabulary vocab) {
-        return service.update(id, vocab);
+    public Vocabulary update(@PathVariable Long id, @Valid @RequestBody VocabularyDto dto) {
+        return service.update(id, dto);
     }
 
     @DeleteMapping("/{id}")

@@ -253,8 +253,15 @@
   opacity: 0.9;
 }
 
-.import-btn:disabled {
-  background: #334155;
-  color: #64748b;
-  cursor: not-allowed;
+
+
+.topic-tag {
+  display: inline-block;
+  background: var(--primary, #6366f1);
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  font-weight: 500;
 }
